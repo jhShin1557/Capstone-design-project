@@ -1,0 +1,336 @@
+drop database if exists PAWINHANSHIN;
+create database PAWINHANSHIN;
+
+use PAWINHANSHIN;
+
+CREATE TABLE users (
+  userno integer NOT NULL AUTO_INCREMENT,
+  id varchar(20) NOT NULL,
+  password varchar(20) NOT NULL,
+  name varchar(20) NOT NULL,
+  age integer,
+  phnum varchar(20),
+  mail varchar(100) NOT NULL,
+  address varchar(100),
+  PRIMARY KEY (userno)
+);
+
+CREATE TABLE board (
+  board_userno integer NOT NULL,
+  boardno integer NOT NULL AUTO_INCREMENT,
+  board_title varchar(100) NOT NULL,
+  board_content varchar(255) NOT NULL,
+  fileAttached integer default 0,
+  board_ani_category boolean NOT NULL,
+  board_reg_date datetime NOT NULL,
+  board_viewcount integer,
+  commentcount integer,
+  likecount integer,
+  PRIMARY KEY (boardno),
+  CONSTRAINT board_userno FOREIGN KEY (board_userno) REFERENCES users (userno) ON DELETE CASCADE
+);
+
+CREATE TABLE boardFile
+(
+boardno integer null,
+boardfileno integer auto_increment,
+reg_date datetime null,
+original_file_name varchar(255) null,
+stored_file_name varchar(255) null,
+fileSize long null,
+primary key(boardfileno),
+foreign key (boardno) references board (boardno) on delete cascade
+);
+
+CREATE TABLE boardcomment (
+  boardcomment_boardno integer NOT NULL,
+  boardcomment_userno integer NOT NULL,
+  commentno integer NOT NULL AUTO_INCREMENT,
+  parcommentno integer NULL,
+  comment varchar(100) NOT NULL,
+  boardcomment_reg_date datetime NOT NULL,
+  PRIMARY KEY (commentno),
+  CONSTRAINT boardcomment_boardno FOREIGN KEY (boardcomment_boardno) REFERENCES board (boardno) ON DELETE CASCADE,
+  CONSTRAINT boardcomment_userno FOREIGN KEY (boardcomment_userno) REFERENCES users (userno) ON DELETE CASCADE
+);
+
+CREATE TABLE protectboard (
+  protectboard_userno integer NOT NULL,
+  protectboardno integer NOT NULL AUTO_INCREMENT,
+  protectboard_title varchar(50) NOT NULL,
+  protectboard_content varchar(255) NOT NULL,
+  fileAttached integer default 0,
+  breeds varchar(20) NOT NULL,
+  protectboard_ani_category boolean NOT NULL,
+  protectboard_reg_date datetime NOT NULL,
+  protectstatus boolean NOT NULL,/*(상태)공고중0, 공고완료1*/
+  starttime datetime NOT NULL,
+  deadline datetime NOT NULL,
+  PRIMARY KEY (protectboardno),
+  CONSTRAINT protectboard_userno FOREIGN KEY (protectboard_userno) REFERENCES users (userno) ON DELETE CASCADE
+);
+
+CREATE TABLE protectboardFile
+(
+protectboardno integer null,
+protectboardfileno integer auto_increment,
+reg_date datetime null,
+original_file_name varchar(255) null,
+stored_file_name varchar(255) null,
+fileSize long null,
+primary key(protectboardfileno),
+foreign key (protectboardno) references protectboard (protectboardno) on delete cascade
+);
+
+CREATE TABLE mapboard (
+  mapboard_userno integer NOT NULL,
+  mapboardno integer NOT NULL AUTO_INCREMENT,
+  mapboard_title varchar(50) NOT NULL,
+  mapboard_content varchar(255) NOT NULL,
+  fileAttached integer default 0,
+  missingtime datetime NOT NULL,
+  missingaddress varchar(100) NOT NULL,
+  latitude double NOT NULL,
+  longitude double NOT NULL,
+  mapboard_reg_date datetime NOT NULL,
+  mapboard_viewcount integer,
+  mapboard_ani_category boolean NOT NULL,
+  writertype boolean NOT NULL,
+  PRIMARY KEY (mapboardno),
+  CONSTRAINT mapboard_userno FOREIGN KEY (mapboard_userno) REFERENCES users (userno) ON DELETE CASCADE
+);
+
+CREATE TABLE mapboardFile(
+mapboardno integer null,
+mapboardfileno integer auto_increment,
+reg_date datetime null,
+original_file_name varchar(255) null,
+stored_file_name varchar(255) null,
+fileSize long null,
+primary key(mapboardfileno),
+foreign key (mapboardno) references mapboard (mapboardno) on delete cascade
+);
+
+CREATE TABLE animalshelter (
+  reqNo integer,
+  resultCode integer,
+  resultMsg varchar(255),
+  errorMsg varchar(255),
+  careNm varchar(255),
+  orgNm varchar(255),
+  divisionNm varchar(255),
+  saveTrgtAnimal varchar(255),
+  careAddr varchar(255),
+  jibunAddr varchar(255),
+  lat varchar(255),
+  lng varchar(255),
+  dsignnationDate date,
+  weekOprAStime time,
+  weekOprAEtime time,
+  weekCellStime time,
+  weekCellEtime time,
+  weekendOprStime time,
+  weekendOprEtime time,
+  weekendCellStime time,
+  weekendCellEtime time,
+  closeDay varchar(255),
+  vetPersonCnt integer,
+  specsPersonCnt integer,
+  medicalCnt integer,
+  breedCnt integer,
+  quarabtineCnt integer,
+  feedCnt integer,
+  transCarCnt integer,
+  careTel varchar(255),
+  dataStdDt integer,
+  numOfRows integer,
+  pageNo integer,
+  totalCount integer,
+  PRIMARY KEY (careNm)
+);
+
+CREATE TABLE MBTI (
+  MBTI integer NOT NULL AUTO_INCREMENT,
+  MBTIcategory varchar(4) NOT NULL,
+  PRIMARY KEY (MBTI)
+);
+
+CREATE TABLE kind(
+    kindCd varchar(20) NOT NULL,
+    KNm varchar(20) NOT NULL,
+    primary key(kindCd)
+);
+
+CREATE TABLE animalMBTIrecommend (
+  animalMBTIrecommend_MBTI integer NOT NULL,
+  animalMBTIrecommend_kindCd varchar(20),
+  animalno integer NOT NULL AUTO_INCREMENT,
+  animalname varchar(20) NOT NULL,
+  PRIMARY KEY (animalno),
+  CONSTRAINT animalMBTIrecommend_kindCd FOREIGN KEY (animalMBTIrecommend_kindCd) REFERENCES kind (kindCd) ON DELETE CASCADE,
+  CONSTRAINT animalMBTIrecommend_MBTI FOREIGN KEY (animalMBTIrecommend_MBTI) REFERENCES MBTI (MBTI) ON DELETE CASCADE
+);
+
+CREATE TABLE mypage (
+  mypage_userno integer NOT NULL,
+  mypage_boardno integer,
+  mypage_protectboardno integer,
+  mypage_mapboardno integer,
+  favorites integer NOT NULL AUTO_INCREMENT,
+  PRIMARY KEY (favorites),
+  CONSTRAINT mypage_userno FOREIGN KEY (mypage_userno) REFERENCES users (userno) ON DELETE CASCADE,
+  CONSTRAINT mypage_boardno FOREIGN KEY (mypage_boardno) REFERENCES board (boardno) ON DELETE CASCADE,
+  CONSTRAINT mypage_protectboardno FOREIGN KEY (mypage_protectboardno) REFERENCES protectboard (protectboardno) ON DELETE CASCADE,
+  CONSTRAINT mypage_mapboardno FOREIGN KEY (mypage_mapboardno) REFERENCES mapboard (mapboardno) ON DELETE CASCADE
+);
+
+create Table likeboard (
+  likeboard_boardno integer NOT NULL,
+  likeboard_userno integer NOT NULL,
+  likeno integer NOT NULL AUTO_INCREMENT,
+  primary key (likeno),
+  CONSTRAINT likeboard_boardno FOREIGN KEY (likeboard_boardno) REFERENCES board (boardno) ON DELETE CASCADE,
+  CONSTRAINT likeboard_userno FOREIGN KEY (likeboard_userno) REFERENCES users (userno) ON DELETE CASCADE
+);
+
+
+/* INSERT DELETE select */
+
+INSERT INTO users(id, password, name, age, phnum, mail, address) VALUES ('하리보1', '2660', '이재성', 26, 01037652660, 'fl53hn@naver.com', '서울시 강동구');
+INSERT INTO users(id, password, name, age, phnum, mail, address) VALUES ('펩시2', '2661', '이명주', 23, 01012345660, 'kwat456@naver.com', '서울시 마포구');
+INSERT INTO users(id, password, name, age, phnum, mail, address) VALUES ('할리스3', '2662', '이상수', 27, 01052353660, 'windows@yahoo.com', '서울시 강북구');
+INSERT INTO users(id, password, name, age, phnum, mail, address) VALUES ('스타벅스4', '2663', '이수지', 25, 01034545660, 'honggildong@gmail.com', '서울시 강서구');
+INSERT INTO users(id, password, name, age, phnum, mail, address) VALUES ('손오공5', '2664', '이명수', 21, 01077777660, 'dlwotjd258@daum.net', '서울시 중구');
+
+INSERT INTO MBTI(MBTIcategory) VALUES ('ENFP');/*1*/
+INSERT INTO mbti(MBTIcategory) VALUES ('ENTJ');/*2*/
+INSERT INTO mbti(MBTIcategory) VALUES ('ISTP');/*3*/
+INSERT INTO mbti(MBTIcategory) VALUES ('INTP');/*4*/
+INSERT INTO mbti(MBTIcategory) VALUES ('ISTJ');/*5*/
+INSERT INTO mbti(MBTIcategory) VALUES ('ENTP');/*6*/
+INSERT INTO mbti(MBTIcategory) VALUES ('ESFJ');/*7*/
+INSERT INTO mbti(MBTIcategory) VALUES ('ISFP');/*8*/
+INSERT INTO mbti(MBTIcategory) VALUES ('ESTP');/*9*/
+INSERT INTO mbti(MBTIcategory) VALUES ('ISFJ');/*10*/
+INSERT INTO mbti(MBTIcategory) VALUES ('INFP');/*11*/
+INSERT INTO mbti(MBTIcategory) VALUES ('INFJ');/*12*/
+INSERT INTO mbti(MBTIcategory) VALUES ('ENFJ');/*13*/
+INSERT INTO mbti(MBTIcategory) VALUES ('ESFP');/*14*/
+INSERT INTO mbti(MBTIcategory) VALUES ('INTJ');/*15*/
+INSERT INTO mbti(MBTIcategory) VALUES ('INTJ');/*16*/
+
+INSERT INTO kind values ('000072', '말티즈');
+INSERT INTO kind values ("000054", "골든리트리버");
+INSERT INTO kind values ('000100', '시바');
+INSERT INTO kind values ('000018', '비숑 프리제');
+INSERT INTO kind values ('000128', '푸들');
+INSERT INTO kind values ('000020', '보더 콜리');
+INSERT INTO kind values ('000050', '프렌치 불독');
+INSERT INTO kind values ('000034', '샤페이');
+INSERT INTO kind values ('000122', '셰퍼드');
+INSERT INTO kind values ('000108', '웰시 코기 펨브로크');
+INSERT INTO kind values ('000041', '도베르만');
+INSERT INTO kind values ('000146', '말라뮤트');
+INSERT INTO kind values ('000096', '사모예드');
+INSERT INTO kind values ('000089', '포메라니안');
+INSERT INTO kind values ('000125', '코카 스파니엘');
+INSERT INTO kind values ('000103', '시베리안 허스키');
+
+INSERT INTO kind values ('000192', '아메리칸 숏헤어');
+INSERT INTO kind values ('000180', '봄베이');
+INSERT INTO kind values ('000189', '스핑크스');
+INSERT INTO kind values ('000195', '터키시앙고라');
+INSERT INTO kind values ('000217', '이집션마우');
+INSERT INTO kind values ('000218', '컬러포인트 숏헤어');
+INSERT INTO kind values ('000219', '시베리아 고양이');
+INSERT INTO kind values ('000220', '랙돌');
+INSERT INTO kind values ('000196', '통키니즈');
+INSERT INTO kind values ('000188', '스코티시폴드');
+INSERT INTO kind values ('000170', '노르웨이 숲');
+INSERT INTO kind values ('000172', '러시안블루');
+INSERT INTO kind values ('000173',  '라가머핀');
+INSERT INTO kind values ('000184', '샴');
+INSERT INTO kind values ('000181', '브리티시 숏헤어');
+INSERT INTO kind values ('000186', '소말리');
+
+INSERT INTO animalMBTIrecommend(animalMBTIrecommend_MBTI, animalMBTIrecommend_kindCd, animalname) values (1, '000072', '말티즈');
+INSERT INTO animalMBTIrecommend(animalMBTIrecommend_MBTI, animalMBTIrecommend_kindCd, animalname) values (2, "000054", "골든리트리버");
+INSERT INTO animalMBTIrecommend(animalMBTIrecommend_MBTI, animalMBTIrecommend_kindCd, animalname) values (3, '000100', '시바');
+INSERT INTO animalMBTIrecommend(animalMBTIrecommend_MBTI, animalMBTIrecommend_kindCd, animalname) values (4, '000018', '비숑 프리제');
+INSERT INTO animalMBTIrecommend(animalMBTIrecommend_MBTI, animalMBTIrecommend_kindCd, animalname) values (5, '000128', '푸들');
+INSERT INTO animalMBTIrecommend(animalMBTIrecommend_MBTI, animalMBTIrecommend_kindCd, animalname) values (6, '000020', '보더 콜리');
+INSERT INTO animalMBTIrecommend(animalMBTIrecommend_MBTI, animalMBTIrecommend_kindCd, animalname) values (7, '000050', '프렌치 불독');
+INSERT INTO animalMBTIrecommend(animalMBTIrecommend_MBTI, animalMBTIrecommend_kindCd, animalname) values (8, '000034', '샤페이');
+INSERT INTO animalMBTIrecommend(animalMBTIrecommend_MBTI, animalMBTIrecommend_kindCd, animalname) values (9, '000122', '셰퍼드');
+INSERT INTO animalMBTIrecommend(animalMBTIrecommend_MBTI, animalMBTIrecommend_kindCd, animalname) values (10, '000108', '웰시 코기 펨브로크');
+INSERT INTO animalMBTIrecommend(animalMBTIrecommend_MBTI, animalMBTIrecommend_kindCd, animalname) values (11, '000041', '도베르만');
+INSERT INTO animalMBTIrecommend(animalMBTIrecommend_MBTI, animalMBTIrecommend_kindCd, animalname) values (12, '000146', '말라뮤트');
+INSERT INTO animalMBTIrecommend(animalMBTIrecommend_MBTI, animalMBTIrecommend_kindCd, animalname) values (13, '000096', '사모예드');
+INSERT INTO animalMBTIrecommend(animalMBTIrecommend_MBTI, animalMBTIrecommend_kindCd, animalname) values (14, '000089', '포메라니안');
+INSERT INTO animalMBTIrecommend(animalMBTIrecommend_MBTI, animalMBTIrecommend_kindCd, animalname) values (15, '000125', '코카 스파니엘');
+INSERT INTO animalMBTIrecommend(animalMBTIrecommend_MBTI, animalMBTIrecommend_kindCd, animalname) values (16, '000103', '시베리안 허스키');
+
+INSERT INTO animalMBTIrecommend(animalMBTIrecommend_MBTI, animalMBTIrecommend_kindCd, animalname) values (1, '000192', '아메리칸 숏헤어');
+INSERT INTO animalMBTIrecommend(animalMBTIrecommend_MBTI, animalMBTIrecommend_kindCd, animalname) values (2, '000180', '봄베이');
+INSERT INTO animalMBTIrecommend(animalMBTIrecommend_MBTI, animalMBTIrecommend_kindCd, animalname) values (3, '000189', '스핑크스');
+INSERT INTO animalMBTIrecommend(animalMBTIrecommend_MBTI, animalMBTIrecommend_kindCd, animalname) values (4, '000195', '터키시앙고라');
+INSERT INTO animalMBTIrecommend(animalMBTIrecommend_MBTI, animalMBTIrecommend_kindCd, animalname) values (5, '000217', '이집션마우');
+INSERT INTO animalMBTIrecommend(animalMBTIrecommend_MBTI, animalMBTIrecommend_kindCd, animalname) values (6, '000218', '컬러포인트 숏헤어');
+INSERT INTO animalMBTIrecommend(animalMBTIrecommend_MBTI, animalMBTIrecommend_kindCd, animalname) values (7, '000219', '시베리아 고양이');
+INSERT INTO animalMBTIrecommend(animalMBTIrecommend_MBTI, animalMBTIrecommend_kindCd, animalname) values (8, '000220', '랙돌');
+INSERT INTO animalMBTIrecommend(animalMBTIrecommend_MBTI, animalMBTIrecommend_kindCd, animalname) values (9, '000196', '통키니즈');
+INSERT INTO animalMBTIrecommend(animalMBTIrecommend_MBTI, animalMBTIrecommend_kindCd, animalname) values (10, '000188', '스코티시폴드');
+INSERT INTO animalMBTIrecommend(animalMBTIrecommend_MBTI, animalMBTIrecommend_kindCd, animalname) values (11, '000170', '노르웨이 숲');
+INSERT INTO animalMBTIrecommend(animalMBTIrecommend_MBTI, animalMBTIrecommend_kindCd, animalname) values (12, '000172', '러시안블루');
+INSERT INTO animalMBTIrecommend(animalMBTIrecommend_MBTI, animalMBTIrecommend_kindCd, animalname) values (13, '000173',  '라가머핀');
+INSERT INTO animalMBTIrecommend(animalMBTIrecommend_MBTI, animalMBTIrecommend_kindCd, animalname) values (14, '000184', '샴');
+INSERT INTO animalMBTIrecommend(animalMBTIrecommend_MBTI, animalMBTIrecommend_kindCd, animalname) values (15, '000181', '브리티시 숏헤어');
+INSERT INTO animalMBTIrecommend(animalMBTIrecommend_MBTI, animalMBTIrecommend_kindCd, animalname) values (16, '000186', '소말리');
+
+select * from animalmbtirecommend;
+select * from animalshelter;
+select * from board;
+select * from boardcomment;
+select * from boardfile;
+select * from kind;
+select * from likeboard;
+select * from mapboard;
+select * from mapboardfile;
+select * from mbti;
+select * from mypage;
+select * from protectboard;
+select * from protectboardfile;
+select * from users;
+
+/*
+0820 수정 - userno 추가 및 PK값 설정, board, protectboard, mapboard, PK값 integer로 수정, forinhanshin->PAWINHANSHIN으로 수정, likeboard추가
+
+0821 수정 - board, protectboard, mapboard, boardcomment, animalMBTIrecommend, areaofinterest, likeboard 안에 컬럼명 수정
+
+0824 수정 - PK값에 AUTO_INCREMENT 추가 및 전체 INSERT 문 수정
+
+0830 수정 - location테이블 삭제, areaofinterest테이블 안에 location 컬럼 추가,
+(board, protectboard, mapboard, boardcomment)date타입 -> datetime으로 수정,
+ protectboard안에 starttime컬럼 추가, 테이블 전체 NOT NULL값 추가,
+ (board, protectboard, mapboard, boardcomment, MBTI, areaofinterest)INSERT문 수정
+
+0831 수정 - animalMBTIrecommend INSERT문 수정
+
+0904수정 - protectboard - title, 내용 데이터타입 -> varchar
+mapboard - title, 내용 데이터타입 -> varchar
+protectboard, mapboard INSERT문 컬럼에 맞춰 수정
+관리자 신고 테이블 추가 - adminboard ( 추후 수정 예정 ) 
+adminboard INSERT문 추가
+
+0911수정 - kind테이블 추가
+
+/*0913수정 - board,mapboard,protectboard 안 컬럼 imagepath -> 각각 fileAttached로 변경, boardFile, protectboardFile, mapboardFile table delete
+
+0917수정 - board,mapboard,protectboard filesize 컬럼 추가(long값), board 테이블 안 title -> board_title수정, int-> integer오타 수정
+
+0919수정 - boardcomment(parcommentno) not null -> not null 삭제, boardcomment insert값 주석처리
+
+0922수정 - parcomment Null값 저장,  mapboard에 latitude, longitude 데이터 타입 decimal->double로 수정
+
+0923수정 - 자잘한 거 다 날림
+*/
